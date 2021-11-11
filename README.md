@@ -1,10 +1,12 @@
-# **az-toolset**: A Docker image with a set of tools for managing Azure services and AKS from a Linux-environment.
+# **az-toolset**: A Docker image suitable for DevOps-work with Azure and AKS/k8s.
 
-This docker image is suitable for DevOps-work with Azure and k8s.
-It includes the following tools:
+Includes the following tools:
 * kubectl
+* helm 3
 * az-cli
 * sudo
+* git
+* openssl
 
 The Dockerfile is configured to always download and install the latest releases of `az-cli` and `kubectl` when building the image. It takes two build arguments:
 * `user`: A user `(id=1000)` the container session will run as. The user is created without a password.

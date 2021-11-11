@@ -5,9 +5,11 @@
 # Docker image suitable for DevOps-work. Includes the following tools:
 #
 #    * kubectl
+#    * helm
 #    * az-cli
 #    * sudo
-#    * Helm
+#    * git
+#    * openssl
 # 
 # This Dockerfile takes two build arguments:
 #    - user: A user the container session will run as. The user is created without a password.
@@ -22,7 +24,7 @@ ARG user
 ARG pw
 
 RUN apk update 
-RUN apk add --no-cache tzdata bash bash-completion curl python3 python3-dev gcc make musl-dev libffi-dev openssl-dev procps sudo
+RUN apk add --no-cache tzdata bash bash-completion curl python3 python3-dev gcc make musl-dev libffi-dev openssl-dev procps sudo openssl vim bind-tools git
 
 # 
 # Timezone is set to UTC+2 inside image
@@ -41,7 +43,7 @@ RUN sed -i "s,# %wheel ALL=(ALL) ALL,%wheel ALL=(ALL) ALL,g" /etc/sudoers
 RUN touch /home/${user}/.bashrc
 RUN chown ${user}:${user} /home/${user}/.bashrc
 RUN echo 'source  /usr/share/bash-completion/bash_completion' >> /home/${user}/.bashrc
-RUN echo "export PS1='\e[36m[\e[1;96m\$(kubectl config current-context)\e[0;36m/\e[1;32m\u\e[90m@\e[1;32m\h\e[0;36m]:\e[94m\w\e[0m$  '" >> /home/${user}/.bashrc
+RUN echo "export PS1='\e[36m[\e[1;93m\$(kubectl config current-context)\e[0;36m][\e[1;32m\u\e[90m@\e[1;32m\h\e[0;36m]:\e[94m\w\e[0m$ '" >> /home/${user}/.bashrc
 
 #
 # Install and set up kubectl and Helm
@@ -52,6 +54,7 @@ RUN mv ./kubectl /usr/bin/kubectl
 RUN echo 'source <(kubectl completion bash)' >> /home/${user}/.bashrc
 RUN curl -s https://get.helm.sh/helm-canary-linux-amd64.tar.gz -o - | tar zxv -C /tmp/
 RUN mv /tmp/linux-amd64/helm /usr/bin
+RUN echo 'source <(helm completion bash)' >> /home/${user}/.bashrc
 
 #
 # Install and set up az-cli
@@ -59,6 +62,7 @@ RUN mv /tmp/linux-amd64/helm /usr/bin
 USER ${user}
 RUN curl -sL https://azurecliprod.blob.core.windows.net/install.py > /tmp/install.py
 RUN printf "\n\n\n\n" | python3 /tmp/install.py
+RUN rm /tmp/install.py
 
 #
 # Start bash shell as configured user
